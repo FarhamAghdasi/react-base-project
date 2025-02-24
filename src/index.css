@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/** Fonts */
+
+@font-face {
+    font-family: 'Vazir';
+    src: url('./assets/fonts/Vazir-Regular-FD.woff2') format('woff2'),
+         url('./assets/fonts/Vazir-Regular-FD.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
+  @font-face {
+    font-family: 'Nifa';
+    src: url('./assets/fonts/nifam.woff2') format('woff2'),
+         url('./assets/fonts/nifam.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
