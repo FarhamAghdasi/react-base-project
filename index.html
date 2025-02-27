@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 
 const Game = () => {
@@ -8,7 +8,7 @@ const Game = () => {
   const [rocketPosition, setRocketPosition] = useState(50);
   const [obstacles, setObstacles] = useState([]);
 
-  const moveRocket = (e) => {
+  const moveRocket = useCallback((e) => {
     if (!isGameStarted || isGameOver) return;
     const speed = 10;
     if (e.key === 'ArrowLeft') {
@@ -17,9 +17,9 @@ const Game = () => {
     if (e.key === 'ArrowRight') {
       setRocketPosition(prev => Math.min(90, prev + speed));
     }
-  };
+  }, [isGameStarted, isGameOver]);
 
-  const generateObstacle = () => {
+  const generateObstacle = useCallback(() => {
     if (!isGameStarted || isGameOver) return;
     const newObstacle = {
       id: Date.now(),
@@ -27,9 +27,9 @@ const Game = () => {
       y: 0
     };
     setObstacles(prev => [...prev, newObstacle]);
-  };
+  }, [isGameStarted, isGameOver]);
 
-  const checkCollision = () => {
+  const checkCollision = useCallback(() => {
     const rocketLeft = rocketPosition;
     const rocketRight = rocketPosition + 10;
     
@@ -44,14 +44,14 @@ const Game = () => {
         rocketRight > obstacleLeft
       );
     });
-  };
+  }, [rocketPosition, obstacles]);
 
   useEffect(() => {
     if (isGameStarted && !isGameOver) {
       const handle = setInterval(generateObstacle, 2000);
       return () => clearInterval(handle);
     }
-  }, [isGameStarted, isGameOver]);
+  }, [isGameStarted, isGameOver, generateObstacle]);
 
   useEffect(() => {
     if (isGameStarted && !isGameOver) {
@@ -72,13 +72,13 @@ const Game = () => {
       window.addEventListener('keydown', moveRocket);
       return () => window.removeEventListener('keydown', moveRocket);
     }
-  }, [isGameStarted, isGameOver]);
+  }, [isGameStarted, isGameOver, moveRocket]);
 
   useEffect(() => {
     if (checkCollision()) {
       setIsGameOver(true);
     }
-  }, [obstacles]);
+  }, [obstacles, checkCollision]);
 
   const startGame = () => {
     setIsGameStarted(true);
@@ -88,7 +88,40 @@ const Game = () => {
     setObstacles([]);
   };
 
-  // بقیه کد مانند قبل...
+  return (
+    <div className="game-container">
+      {!isGameStarted ? (
+        <button className="start-button" onClick={startGame}>
+          شروع بازی
+        </button>
+      ) : (
+        <>
+          <div className="score">امتیاز: {score}</div>
+          <div 
+            className="rocket"
+            style={{ left: `${rocketPosition}%` }}
+          />
+          {obstacles.map(obstacle => (
+            <div
+              key={obstacle.id}
+              className="obstacle"
+              style={{
+                left: `${obstacle.x}%`,
+                top: `${obstacle.y}%`
+              }}
+            />
+          ))}
+          {isGameOver && (
+            <div className="game-over">
+              <h2>بازی تمام شد!</h2>
+              <p>امتیاز نهایی: {score}</p>
+              <button onClick={startGame}>دوباره شروع کن</button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
 };
 
 export default Game;
