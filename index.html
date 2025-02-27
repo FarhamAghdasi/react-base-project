@@ -1,6 +1,10 @@
-// App.js
 import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
+import rocketImage from './assets/rocket.png'; // تصویر راکت
+import startButtonImage from './assets/start-button.png'; // تصویر دکمه شروع
+import obstacle1Image from './assets/obstacle1.png'; // تصویر مانع ۱
+import obstacle2Image from './assets/obstacle2.png'; // تصویر مانع ۲
+import obstacle3Image from './assets/obstacle3.png'; // تصویر مانع ۳
 
 const Game = () => {
   const [isGameStarted, setIsGameStarted] = useState(false);
@@ -8,6 +12,9 @@ const Game = () => {
   const [score, setScore] = useState(0);
   const [rocketPosition, setRocketPosition] = useState(50);
   const [obstacles, setObstacles] = useState([]);
+
+  // لیست تصاویر موانع
+  const obstacleImages = [obstacle1Image, obstacle2Image, obstacle3Image];
 
   const moveRocket = useCallback((e) => {
     if (!isGameStarted || isGameOver) return;
@@ -25,10 +32,11 @@ const Game = () => {
     const newObstacle = {
       id: Date.now(),
       x: Math.random() * 90,
-      y: 0
+      y: 0,
+      image: obstacleImages[Math.floor(Math.random() * obstacleImages.length)] // انتخاب تصادفی تصویر مانع
     };
     setObstacles(prev => [...prev, newObstacle]);
-  }, [isGameStarted, isGameOver]);
+  }, [isGameStarted, isGameOver, obstacleImages]);
 
   const checkCollision = useCallback(() => {
     const rocketLeft = rocketPosition;
@@ -93,7 +101,7 @@ const Game = () => {
     <div className="game-container">
       {!isGameStarted ? (
         <button className="start-button" onClick={startGame}>
-          شروع بازی
+          <img src={startButtonImage} alt="شروع بازی" />
         </button>
       ) : (
         <>
@@ -101,7 +109,9 @@ const Game = () => {
           <div 
             className="rocket"
             style={{ left: `${rocketPosition}%` }}
-          />
+          >
+            <img src={rocketImage} alt="راکت" />
+          </div>
           {obstacles.map(obstacle => (
             <div
               key={obstacle.id}
@@ -110,7 +120,9 @@ const Game = () => {
                 left: `${obstacle.x}%`,
                 top: `${obstacle.y}%`
               }}
-            />
+            >
+              <img src={obstacle.image} alt="مانع" />
+            </div>
           ))}
           {isGameOver && (
             <div className="game-over">
